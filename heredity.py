@@ -20,7 +20,7 @@ class Nissan (Vehicle, Car):
         self.price = 2000000
 
     def horse_powers(self):
-        super().horse_powers(self)
+        super().horse_powers()
         self.horse_powers = 200
         self.vehicle_type = 'седан'
         self.price = 2000000
