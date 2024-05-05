@@ -26,10 +26,11 @@ def squaring(x):
 print(squaring(3))
 
 class Rect:
-   def __init__(self, a):
+   def __init__(self, a, b):
        self.a = a
-   def __call__(self, b):
-       return self.a * b
+       self.b = b
+   def __call__(self):
+       return self.a * self.b
 
-rectangle = Rect(5)
-print(rectangle(7))
+rectangle = Rect(5, 7)
+print(rectangle())
