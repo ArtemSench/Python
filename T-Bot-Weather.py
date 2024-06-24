@@ -1,37 +1,47 @@
+import telebot
 import requests
-import queue
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
-# Функция для /start
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('Привет! Отправь мне сообщение, и я повторю его.')
+# Токен от BotFather
+TELEGRAM_API_TOKEN = '6420734049:AAGDgiMFQyClHGSn9GRYoRUzt7tPF0zCJjM'
+# API-ключ от WeatherAPI
+WEATHER_API_KEY = '2a34c5683466463ab94105743241906'
 
-# Функция для обработки сообщений
-def echo(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(update.message.text)
+bot = telebot.TeleBot(TELEGRAM_API_TOKEN)
 
-def main() -> None:
-    # Токен, полученный от https://t.me/BotFather
-    token = '7386171008:AAFTNGv9f_5xCHMHpcFT9YOjP8DVF3Bj-GM'
+def get_weather(city):
+    url = f"http://api.weatherapi.com/v1/current.json?key={WEATHER_API_KEY}&q={city}&aqi=no"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        location = data['location']['name']
+        country = data['location']['country']
+        last_updated = data['current']["last_updated"]
+        temp_c = data['current']['temp_c']
+        feelslike = data['current']['feelslike_c']
+        cloud = data['current']['cloud']
+        humidity = data['current']['humidity']
+        wind_kph = data['current']['wind_kph']
+        wind_ms = round(wind_kph*0.278, 2)
+        return (f'Погода в {location}, {country}:\n'
+                f'Последнее обновление: {last_updated}\n'
+                f'Температура: {temp_c}°C\n'
+                f'Ощущается как: {feelslike}°C\n'
+                f'Облачность: {cloud}\n'
+                f'Влажность: {humidity}%\n'
+                f'Скорость ветра: {wind_ms} м/с')
+    else:
+        return "Не удалось получить данные о погоде. Пожалуйста, проверьте название города."
 
-    # Создаем Updater и передаем ему токен
-    updater = Updater(token)
+@bot.message_handler(commands=['start', 'help'])
+def send_welcome(message):
+    bot.reply_to(message, "Привет! Я бот, который предоставляет информацию о погоде. Введите название города, чтобы узнать текущую погоду.")
 
-    # Получаем диспетчера для регистрации обработчиков
-    dispatcher = updater.dispatcher
+@bot.message_handler(func=lambda message: True)
+def send_weather(message):
+    city = message.text
+    weather_info = get_weather(city)
+    bot.reply_to(message, weather_info)
 
-    # Регистрируем обработчик для команды /start
-    dispatcher.add_handler(CommandHandler("start", start))
-
-    # Регистрируем обработчик для всех текстовых сообщений
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
-
-    # Запускаем бота
-    updater.start_polling()
-
-    # Останавливаем бота при завершении работы
-    updater.idle()
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    print("Бот запущен. Нажмите Ctrl+C для остановки.")
+    bot.polling(none_stop=True)
