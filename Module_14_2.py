@@ -46,7 +46,13 @@ total_users = cursor.fetchone()[0]
 cursor.execute('SELECT SUM(balance) FROM Users')
 all_balance = cursor.fetchone()[0]
 
-print(f'Средний баланс всех пользователей: {all_balance / total_users}')
+#Cредний баланс всех пользователей 1 метод:
+print(f'Средний баланс всех пользователей (1 метод): {all_balance / total_users}')
+
+#Cредний баланс всех пользователей 2 метод:
+cursor.execute('SELECT AVG(balance) FROM Users')
+avg_balance = cursor.fetchone()[0]
+print(f'Средний баланс всех пользователей (2 метод): {avg_balance}')
 
 connection.commit()
 connection.close()
