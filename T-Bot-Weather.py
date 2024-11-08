@@ -2,7 +2,7 @@ import telebot
 import requests
 
 # Токен от BotFather
-TELEGRAM_API_TOKEN = '6420734049:AAGDgiMFQyClHGSn9GRYoRUzt7tPF0zCJjM'
+TELEGRAM_API_TOKEN = ''
 # API-ключ от WeatherAPI
 WEATHER_API_KEY = '2a34c5683466463ab94105743241906'
 
